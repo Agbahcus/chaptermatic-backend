@@ -26,9 +26,9 @@ SECRET_KEY = "django-insecure-p4+zob9q4yrbi2l0=1j4flf88*k%h4d(x7w1vd*hycojy0nznb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
-
+# Replace your ALLOWED_HOSTS section with:
+# Find the ALLOWED_HOSTS line and update it:
+ALLOWED_HOSTS = ['chaptermatic-api.onrender.com', 'localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,11 +43,13 @@ INSTALLED_APPS = [
     "chaptermatic",
 ]
 
-
-CORS_ALLOW_ALL_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-]
+if DEBUG:
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOWED_ORIGINS = [
+        'https://chaptermatic-api.onrender.com',  # Add your own domain
+    ]
+    CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_METHODS = [
     'GET',
     'POST',
