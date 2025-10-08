@@ -1,61 +1,32 @@
-import yt_dlp
+from youtube_transcript_api import YouTubeTranscriptApi
 import re
 
 def get_transcript_from_youtube(url):
-    """Get transcript using yt-dlp"""
+    """Get transcript with timestamps"""
     video_id = extract_video_id(url)
     print(f"DEBUG: Extracted video_id: {video_id}")
     if not video_id:
         return None
     
     try:
-        ydl_opts = {
-            'writesubtitles': True,
-            'writeautomaticsub': True,
-            'subtitleslangs': ['en'],
-            'skip_download': True,
-            'quiet': True,
-        }
+        # Try to get transcript in any available language
+        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
         
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=False)
-            
-            # Get subtitles
-            if 'subtitles' in info and 'en' in info['subtitles']:
-                # Manual subtitles preferred
-                sub_url = info['subtitles']['en'][0]['url']
-            elif 'automatic_captions' in info and 'en' in info['automatic_captions']:
-                # Fall back to auto-generated
-                sub_url = info['automatic_captions']['en'][0]['url']
-            else:
-                print("DEBUG: No subtitles found")
-                return None
-            
-            # Fetch and parse subtitle file
-            import urllib.request
-            import json
-            
-            response = urllib.request.urlopen(sub_url)
-            subtitle_data = json.loads(response.read())
-            
-            # Convert to our format
-            transcript_list = []
-            for event in subtitle_data.get('events', []):
-                if 'segs' in event:
-                    text = ''.join([seg.get('utf8', '') for seg in event['segs']])
-                    transcript_list.append({
-                        'start': event.get('tStartMs', 0) / 1000,
-                        'duration': event.get('dDurationMs', 0) / 1000,
-                        'text': text.strip()
-                    })
-            
-            print(f"DEBUG: Got {len(transcript_list)} transcript entries")
-            return transcript_list
-            
+        # Try English firstsssss
+        try:
+            transcript = transcript_list.find_transcript(['en'])
+            result = transcript.fetch()
+            print(f"DEBUG: Got {len(result)} transcript entries")
+            return result
+        except:
+            # Get any available language
+            for transcript in transcript_list:
+                result = transcript.fetch()
+                print(f"DEBUG: Got {len(result)} entries in {transcript.language}")
+                return result
+                
     except Exception as e:
         print(f"DEBUG ERROR: {type(e).__name__}: {str(e)}")
-        import traceback
-        traceback.print_exc()
         return None
 
 def extract_video_id(url):
@@ -69,6 +40,7 @@ def extract_video_id(url):
             return match.group(1)
     return None
 
+# Keep your existing generate_chapters, generate_title_from_text, and format_timestamp functions
 # Keep your generate_chapters, generate_title_from_text, and format_timestamp functions as-is
 
 def generate_chapters(transcript_list):
