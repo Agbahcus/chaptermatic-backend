@@ -43,13 +43,13 @@ INSTALLED_APPS = [
     "chaptermatic",
 ]
 
+# Find the CORS_ALLOWED_ORIGINS section and update it:
 if DEBUG:
     CORS_ALLOW_ALL_ORIGINS = True
 else:
     CORS_ALLOWED_ORIGINS = [
-        'https://chaptermatic-api.onrender.com',  # Add your own domain
+        'https://inspiring-dusk-ecff2c.netlify.app',
     ]
-    CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_METHODS = [
     'GET',
     'POST',
