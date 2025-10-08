@@ -154,7 +154,8 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     
     # Static files
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Update CORS - replace your existing CORS settings with this:
 if DEBUG:
